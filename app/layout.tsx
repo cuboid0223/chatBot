@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../pages/api/auth/[...nextauth]";
 import LoginPage from "../components/LoginPage";
+import ClientProvider from "../components/ClientProvider";
 export const metadata = {
   title: "對話式 bot",
   description: "none",
@@ -15,7 +16,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  // console.log(session);
+  console.log(session);
   return (
     <html lang="en">
       <body>
@@ -26,7 +27,8 @@ export default async function RootLayout({
             <div className="flex">
               {/* sidebar */}
               <SideBar />
-              {/* chatGPT thinking notification  */}
+              {/* chatGPT thinking notification  -> ClientProvider */}
+              <ClientProvider />
 
               {/* main page */}
               <div className="bg-[#343541] flex-1">{children}</div>

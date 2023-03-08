@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import NewChat from "./NewChat";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { collection } from "firebase/firestore";
+import { collection, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase";
 import ChatRow from "./ChatRow";
 
@@ -11,7 +11,11 @@ function SideBar() {
 
   // 利用 firebase-hook 取得使用者所有 chats
   const [chats, loading, error] = useCollection(
-    session && collection(db, "users", session.user?.email!, "chats")
+    session &&
+      query(
+        collection(db, "users", session.user?.email!, "chats"),
+        orderBy("createdAt", "desc")
+      )
   );
 
   return (
@@ -23,7 +27,7 @@ function SideBar() {
 
         {/* map through the chats */}
         {chats?.docs.map((chat) => (
-          <ChatRow id={chat.id} />
+          <ChatRow id={chat.id} key={chat.id} />
         ))}
       </div>
 
