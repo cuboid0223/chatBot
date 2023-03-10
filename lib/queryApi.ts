@@ -6,7 +6,7 @@ const query = async (prompt: string, chatId: string, model: string) => {
       model,
       prompt,
       /* 決定回傳的答案要偏向 創意性還是邏輯性*/
-      temperature: 0.9,
+      temperature: 0.6,
       top_p: 1,
       /* ------------------------------*/
       max_tokens: 1000,

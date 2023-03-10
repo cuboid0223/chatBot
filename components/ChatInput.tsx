@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { db } from "../firebase";
+import ModelSelection from "./ModelSelection";
+import useSWR from "swr";
 
 type Props = {
   chatId: string;
@@ -15,7 +17,9 @@ function ChatInput({ chatId }: Props) {
   const { data: session } = useSession();
 
   // useSWR to get model
-  const model = "text-davinci-003";
+  const { data: model, mutate: setModel } = useSWR("model", {
+    fallbackData: "text-davinci-003",
+  });
 
   const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +37,7 @@ function ChatInput({ chatId }: Props) {
           `https://ui-avatars.com/api/?name=${session?.user?.name}`,
       },
     };
-    
+
     await addDoc(
       collection(
         db,
@@ -87,7 +91,10 @@ function ChatInput({ chatId }: Props) {
         </button>
       </form>
 
-      <div>{/* ModelSelection */}</div>
+      <div className="md:hidden">
+        {/*show ModelSelection  on ipad or hand phone*/}
+        <ModelSelection />
+      </div>
     </div>
   );
 }
