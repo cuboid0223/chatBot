@@ -10,4 +10,16 @@
   .chatRow {
     @apply rounded-lg px-5 py-3 text-sm flex items-center justify-center space-x-2 hover:bg-gray-700/70 cursor-pointer text-gray-300 transition-all duration-200 ease-out;
   }
+
+  .btnGray {
+    @apply text-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center m-2;
+  }
+
+  .modal {
+    @apply bg-[#fff] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 rounded-sm;
+  }
+
+  .overlay {
+    @apply bg-[red];
+  }
 }

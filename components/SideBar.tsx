@@ -6,6 +6,7 @@ import { collection, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase";
 import ChatRow from "./ChatRow";
 import ModelSelection from "./ModelSelection";
+import StartChatModalBtn from "./StartChatModalBtn";
 
 function SideBar() {
   const { data: session } = useSession();
@@ -40,14 +41,17 @@ function SideBar() {
           ))}
         </section>
       </div>
-
-      {session && (
-        <img
-          src={session.user?.image!}
-          className="h-12 w-12 rounded-full cursor-pointer mx-auto mb-2 hover:opacity-50"
-          alt="Profile pic"
-        />
-      )}
+      <div className="flex justify-end">
+        {session && (
+          <img
+            src={session.user?.image!}
+            className="h-12 w-12 rounded-full cursor-pointer mx-auto mb-2 hover:opacity-50"
+            alt="Profile pic"
+          />
+        )}
+        {/* 對話功能 modal 開啟按鈕 */}
+        <StartChatModalBtn />
+      </div>
     </main>
   );
 }

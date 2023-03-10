@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.16",
+    "@types/react-modal": "^3.13.1",
     "firebase": "^9.17.2",
     "firebase-admin": "^11.5.0",
     "next": "latest",
@@ -16,6 +17,7 @@
     "react-dom": "18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-hot-toast": "^2.4.0",
+    "react-modal": "^3.16.1",
     "react-select": "^5.7.0",
     "swr": "^2.1.0"
   },
