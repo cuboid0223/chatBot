@@ -5,6 +5,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../pages/api/auth/[...nextauth]";
 import LoginPage from "../components/LoginPage";
 import ClientProvider from "../components/ClientProvider";
+// use context Api to solve global state problem
+import { StateProvider } from "../components/StateProvider";
+import reducer, { initialState } from "../lib/reducer";
+// ----------
 export const metadata = {
   title: "對話式 bot",
   description: "none",
@@ -22,19 +26,21 @@ export default async function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider session={session}>
-          {!session ? (
-            <LoginPage />
-          ) : (
-            <div className="flex">
-              {/* sidebar */}
-              <SideBar />
-              {/* chatGPT thinking notification  -> ClientProvider */}
-              <ClientProvider />
+          <StateProvider initialState={initialState} reducer={reducer}>
+            {!session ? (
+              <LoginPage />
+            ) : (
+              <div className="flex">
+                {/* sidebar */}
+                <SideBar />
+                {/* chatGPT thinking notification  -> ClientProvider */}
+                <ClientProvider />
 
-              {/* main page */}
-              <div className="bg-[#343541] flex-1">{children}</div>
-            </div>
-          )}
+                {/* main page */}
+                <div className="bg-[#343541] flex-1">{children}</div>
+              </div>
+            )}
+          </StateProvider>
         </SessionProvider>
       </body>
     </html>

@@ -9,3 +9,13 @@ interface Message {
     avatar: string;
   };
 }
+
+interface Action {
+  type: string;
+  isStartChatModalOpen: boolean;
+}
+
+interface Reducer {
+  action: Action;
+  state: any;
+}
