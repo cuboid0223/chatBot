@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { adminDb } from "../../firebaseAdmin";
 import admin from "firebase-admin";
 import query from "../../lib/queryApi";
+import queryImage from "../../lib/queryImageApi";
 type Data = {
   answer: string;
 };
@@ -22,9 +23,15 @@ export default async function handler(
     return;
   }
 
-  //   chatGPt
+
+  //   chatGPt prompt completion
   const response = await query(prompt, chatId, model).then((response) => {
     return response;
+  });
+
+  // chatGPt prompt image generation
+  const resImage = await queryImage(prompt).then((resImage) => {
+    return resImage;
   });
 
   const message: Message = {
@@ -37,7 +44,7 @@ export default async function handler(
     },
   };
 
-  console.log("res", message);
+  //console.log("resImage", resImage);
 
   // 將 chatGPT 回答寫入資料庫
   await adminDb

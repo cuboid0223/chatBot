@@ -1,20 +1,20 @@
 "use client";
 
 export const initialState = {
-  isStartChatModalOpen: false,
+  isRecordingOn: false,
 };
 
 export const actionTypes = {
-  SET_IS_START_CHAT_MODAL_OPEN: "SET_IS_START_CHAT_MODAL_OPEN",
+  SET_IS_RECORDING_ON: "SET_IS_RECORDING_ON",
 };
 
 const reducer = (state: any, action: Action) => {
   console.log(action);
   switch (action.type) {
-    case actionTypes.SET_IS_START_CHAT_MODAL_OPEN:
+    case actionTypes.SET_IS_RECORDING_ON:
       return {
         ...state,
-        isStartChatModalOpen: action.isStartChatModalOpen,
+        isRecordingOn: action.isRecordingOn,
       };
 
     default:
