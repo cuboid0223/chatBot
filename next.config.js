@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
+  env: {
+    SPEECH_KEY: process.env.SPEECH_KEY,
+    SPEECH_REGION: process.env.SPEECH_REGION,
+  },
   experimental: {
     appDir: true, // 允許 app 資料夾的存在？
   },

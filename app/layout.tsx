@@ -24,7 +24,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body>
+      <body cz-shortcut-listen="true">
         <SessionProvider session={session}>
           <StateProvider initialState={initialState} reducer={reducer}>
             {!session ? (

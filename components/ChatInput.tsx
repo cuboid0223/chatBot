@@ -11,6 +11,7 @@ import useSWR from "swr";
 import { ResultReason } from "microsoft-cognitiveservices-speech-sdk";
 import { getTokenOrRefresh } from "../lib/getTokenOrRefresh";
 import { useStateValue } from "./StateProvider";
+import speak from "../lib/speak";
 
 const speechsdk = require("microsoft-cognitiveservices-speech-sdk");
 
@@ -68,6 +69,7 @@ function ChatInput({ chatId }: Props) {
 
     // toast notification to Loading
     const notification = toast.loading("我想想");
+    speak("我想想");
     await fetch("/api/askQuestion", {
       method: "POST",
       headers: {
@@ -120,6 +122,7 @@ function ChatInput({ chatId }: Props) {
 
     // toast notification to Loading
     const notification = toast.loading("我想想");
+
     await fetch("/api/askQuestion", {
       method: "POST",
       headers: {
@@ -131,12 +134,19 @@ function ChatInput({ chatId }: Props) {
         model,
         session,
       }),
-    }).then(() => {
-      // toast notification successful
-      toast.success("想好了", {
-        id: notification,
+    })
+      .then((res) => {
+        // toast notification successful
+        toast.success("想好了", {
+          id: notification,
+        });
+        return res.json();
+      })
+      .then((res) => {
+        console.log(res.answer);
+        speak(res.answer);
+        return res.answer;
       });
-    });
   };
 
   const setUpRecognizer = async () => {

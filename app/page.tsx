@@ -1,9 +1,12 @@
+"use client";
+
 import {
   SunIcon,
   BoltIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-
+import { useEffect } from "react";
+import speak from "../lib/speak";
 // type "rfce" making quick snip
 
 function HomePage() {

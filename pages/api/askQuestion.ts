@@ -4,6 +4,8 @@ import { adminDb } from "../../firebaseAdmin";
 import admin from "firebase-admin";
 import query from "../../lib/queryApi";
 import queryImage from "../../lib/queryImageApi";
+import speak from "../../lib/speak";
+
 type Data = {
   answer: string;
 };
@@ -23,16 +25,15 @@ export default async function handler(
     return;
   }
 
-
   //   chatGPt prompt completion
   const response = await query(prompt, chatId, model).then((response) => {
     return response;
   });
 
   // chatGPt prompt image generation
-  const resImage = await queryImage(prompt).then((resImage) => {
-    return resImage;
-  });
+  // const resImage = await queryImage(prompt).then((resImage) => {
+  //   return resImage;
+  // });
 
   const message: Message = {
     text: response || "找不到答案ㄋㄟ ",
@@ -45,6 +46,7 @@ export default async function handler(
   };
 
   //console.log("resImage", resImage);
+  // speak(message?.text);
 
   // 將 chatGPT 回答寫入資料庫
   await adminDb
