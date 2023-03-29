@@ -10,6 +10,11 @@ interface Message {
   };
 }
 
+interface Messages {
+  role: string;
+  content: string;
+}
+
 interface Action {
   type: string;
   isStartChatModalOpen: boolean;

@@ -17,6 +17,33 @@ module.exports = {
       },
     ],
   },
+
+  webpack(config, options) {
+    const { isServer } = options;
+    // fs import in next.js    https://stackoverflow.com/questions/64361940/webpack-error-configuration-node-has-an-unknown-property-fs
+    if (!isServer) {
+      config.resolve.fallback.fs = false;
+    }
+    // import mp3 in next.js   https://github.com/vercel/next.js/discussions/12810
+    config.module.rules.push({
+      test: /\.(ogg|mp3|wav|mpe?g)$/i,
+      exclude: config.exclude,
+      use: [
+        {
+          loader: require.resolve("url-loader"),
+          options: {
+            limit: config.inlineImageLimit,
+            fallback: require.resolve("file-loader"),
+            publicPath: `${config.assetPrefix}/_next/static/images/`,
+            outputPath: `${isServer ? "../" : ""}static/images/`,
+            name: "[name]-[hash].[ext]",
+            esModule: config.esModule || false,
+          },
+        },
+      ],
+    });
+    return config;
+  },
 };
 
 // crtl + ` => toggle terminal

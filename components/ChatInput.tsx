@@ -1,18 +1,22 @@
 "use client";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { db } from "../firebase";
 import ModelSelection from "./ModelSelection";
 import useSWR from "swr";
-
-import { ResultReason } from "microsoft-cognitiveservices-speech-sdk";
 import { getTokenOrRefresh } from "../lib/getTokenOrRefresh";
 import { useStateValue } from "./StateProvider";
 import speak from "../lib/speak";
-
+import { useCollection } from "react-firebase-hooks/firestore";
 const speechsdk = require("microsoft-cognitiveservices-speech-sdk");
 
 type Props = {
@@ -26,13 +30,49 @@ type Data = {
 
 function ChatInput({ chatId }: Props) {
   const [prompt, setPrompt] = useState("");
+  const [answer, setAnswer] = useState("");
   const { data: session } = useSession();
   const [{ isRecordingOn }, dispatch] = useStateValue();
-
+  const [messages] = useCollection(
+    session &&
+      query(
+        collection(
+          db,
+          "users",
+          session?.user?.email!,
+          "chats",
+          chatId,
+          "messages"
+        ),
+        orderBy("createdAt", "asc")
+      )
+  );
+  // console.log(messages);
   // useSWR to get model
   const { data: model, mutate: setModel } = useSWR("model", {
-    fallbackData: "text-davinci-003",
+    fallbackData: "gpt-3.5-turbo",
   });
+
+  const modifyMessageAttr = (message) => {
+    // 將fetch 回來的資料 修改成  messages: { role: string; content: string }[]
+    const newFormatMsg = {
+      role: message.user?._id === "ChatGPT" ? "assistant" : "user",
+      content: message.text,
+    };
+
+    return newFormatMsg;
+  };
+
+  const fetchAllChatMessages = (messages) => {
+    // fetch all chats messages
+    if (!messages) return;
+    let temp = [];
+    messages?.map((message) => {
+      temp.push(modifyMessageAttr(message.data()));
+    });
+
+    return temp;
+  };
 
   const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
     // if (!prompt) return;
@@ -42,6 +82,7 @@ function ChatInput({ chatId }: Props) {
     }
     e.preventDefault();
     const input = prompt.trim();
+    window.scrollTo(0, document.body.scrollHeight);
     setPrompt("");
     const message: Message = {
       text: input,
@@ -67,9 +108,11 @@ function ChatInput({ chatId }: Props) {
       message
     );
 
+    let msgs = fetchAllChatMessages(messages?.docs);
+    msgs?.push({ role: "user", content: input });
+    // console.log("msg: ", msgs);
     // toast notification to Loading
     const notification = toast.loading("我想想");
-    speak("我想想");
     await fetch("/api/askQuestion", {
       method: "POST",
       headers: {
@@ -77,6 +120,7 @@ function ChatInput({ chatId }: Props) {
       },
       body: JSON.stringify({
         prompt: input,
+        messages: msgs,
         chatId,
         model,
         session,
@@ -93,7 +137,10 @@ function ChatInput({ chatId }: Props) {
     if (!promptFromMic) {
       return;
     }
-
+    if (answer === promptFromMic) {
+      console.log("表示該聲音是AI 的聲音");
+      return;
+    }
     const input = promptFromMic.trim();
     setPrompt("");
     const message: Message = {
@@ -107,6 +154,7 @@ function ChatInput({ chatId }: Props) {
           `https://ui-avatars.com/api/?name=${session?.user?.name}`,
       },
     };
+
     console.log(message);
     await addDoc(
       collection(
@@ -120,6 +168,9 @@ function ChatInput({ chatId }: Props) {
       message
     );
 
+    let msgs = fetchAllChatMessages(messages?.docs);
+    msgs?.push({ role: "user", content: input });
+
     // toast notification to Loading
     const notification = toast.loading("我想想");
 
@@ -130,6 +181,7 @@ function ChatInput({ chatId }: Props) {
       },
       body: JSON.stringify({
         prompt: input,
+        messages: msgs,
         chatId,
         model,
         session,
@@ -144,6 +196,7 @@ function ChatInput({ chatId }: Props) {
       })
       .then((res) => {
         console.log(res.answer);
+        setAnswer(res.answer);
         speak(res.answer);
         return res.answer;
       });
@@ -177,7 +230,7 @@ function ChatInput({ chatId }: Props) {
         await sendMessageFromMic(recognizedText);
       };
     } else {
-      console.log("stop ");
+      // console.log("stop ");
       recognizer.stopContinuousRecognitionAsync();
     }
   };
@@ -185,6 +238,10 @@ function ChatInput({ chatId }: Props) {
   useEffect(() => {
     sttFromMic();
   }, [isRecordingOn]);
+
+  useEffect(() => {
+    fetchAllChatMessages(messages?.docs);
+  }, [messages]);
 
   return (
     <div className="bg-gray-700/50 text-gray-400 rounded-lg text-sm ">

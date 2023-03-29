@@ -14,7 +14,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const { prompt, chatId, model, session } = req.body;
+  const { prompt, chatId, model, session, messages } = req.body;
 
   if (!prompt) {
     res.status(400).json({ answer: "請輸入文字" });
@@ -26,9 +26,11 @@ export default async function handler(
   }
 
   //   chatGPt prompt completion
-  const response = await query(prompt, chatId, model).then((response) => {
-    return response;
-  });
+  const response = await query(prompt, chatId, model, messages).then(
+    (response) => {
+      return response;
+    }
+  );
 
   // chatGPt prompt image generation
   // const resImage = await queryImage(prompt).then((resImage) => {
@@ -36,7 +38,7 @@ export default async function handler(
   // });
 
   const message: Message = {
-    text: response || "找不到答案ㄋㄟ ",
+    text: response?.content || "找不到答案ㄋㄟ ",
     createdAt: admin.firestore.Timestamp.now(),
     user: {
       _id: "ChatGPT",
