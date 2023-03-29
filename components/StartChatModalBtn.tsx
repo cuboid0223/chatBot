@@ -15,6 +15,7 @@ function StartChatModalBtn() {
       type: actionTypes.SET_IS_RECORDING_ON,
       isRecordingOn: true,
     });
+    ModalToggle();
   };
 
   const handleRecordingOff = () => {
